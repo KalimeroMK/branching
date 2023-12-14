@@ -1,79 +1,64 @@
-### Main branches
 
-At the core, the development model is greatly inspired by existing models out there, especially gitflow. The central
-repo holds two main branches with an infinite lifetime with **develop being the default branch:**
+# Project Git Workflow Guide
 
-- `master` - Always reflects a production-ready state.
+## Main Branches
 
-- `develop`- Always reflects a state with the latest delivered development changes for the next release.
+### Master Branch
+- **Purpose**: Represents the production-ready state.
+- **Best Practices**: 
+  - Only merge code that is thoroughly tested and stable.
+  - Regularly update with developed features to keep production current.
+- **Usage**:
+  - Represents the "source of truth" for production code.
+  - Used for deploying code to production environments.
 
-When the source code in the develop branch reaches a stable point and is ready to be released, all of the changes should
-be merged back into master and then **tagged with a release number.**
+### Develop Branch
+- **Purpose**: Contains the latest development changes for the next release.
+- **Best Practices**: 
+  - Frequently commit and merge new features and fixes to keep it updated.
+  - Regularly sync with the master branch to stay aligned with production.
+- **Usage**:
+  - Serves as a base for creating feature, bugfix, and hotfix branches.
+  - Acts as a staging area for the next release.
 
-### Supporting branches
+#### Release Process
+- **When to Release**: Once the `develop` branch is stable and ready.
+- **Steps**:
+  1. Merge `develop` into `master`.
+  2. Tag the commit in `master` with a release number.
+  3. Deploy from `master` to production.
 
-Our development model uses a variety of supporting branches to aid parallel development between team members, ease
-tracking of features, prepare for production releases and to assist in quickly fixing live production problems. **These
-branches should be short lived to ensure the best development experience.**
+## Supporting Branches
 
-The different types of branches we may use are:
+### Feature Branches
+- **Purpose**: Develop new features independently.
+- **Creation**: `git checkout -b feature/my-feat develop`.
+- **Merging**: After completion, merge back into `develop`.
+- **Best Practices**:
+  - Keep the branch updated with `develop` to avoid conflicts.
+  - Write unit tests for new features.
+  - Review code before merging.
 
-- Feature branches
-- Bugfix branches
-- Hotfix branches
+### Bugfix Branches
+- **Purpose**: Address bugs in the current development state.
+- **Creation**: `git checkout -b bugfix/my-issue develop`.
+- **Merging**: Merge back into `develop` after fixing the issue.
+- **Best Practices**:
+  - Add regression tests to ensure the bug does not recur.
+  - Keep the branch small and focused on a specific issue.
 
-**FEATURES:**
-
-Use to develop new features starting from the `develop` branch. Merge back into `develop` branch waiting for a
-reasonable amount of features to be there before declaring it a release.
-
-```
-Create Branch:
-$ git checkout -b feature/my-feat develop
-
-Merge Changes:
-$ git checkout develop
-$ git merge --no-ff feature/my-feat
-$ git branch -d feature/my-feat
-$ git push origin develop
-```
-
-**BUGFIXES:**
-
-Use to work on bugfixes starting from the `develop` branch. Merge back into `develop` branch waiting for a reasonable
-amount of bugs to be there before declaring it a minor release.
-
-```
-Create branch:
-$ git checkout -b bugfix/my-issue develop
-
-Merge Changes:
-$ git checkout develop
-$ git merge --no-ff bugfix/my-issue
-$ git branch -d bugfix/my-issue
-$ git push origin develop
-```
-
-**HOTFIXES:**
-
-The `hotfix` branch starts off `master` to avoid involuntary send to production of unwanted features that my be present
-in branches. The `hotfix` must be used when an important bug arises in production which must be fixed and can't wait for
-other features to be ready. It merges back to `master` and `develop`.
-
-```
-Create Branch:
-$ git checkout -b hotfix/1.2.1 master
-$ ./bump-version.sh 1.2.1
-$ git commit -a -m "Bumped version number to 1.2.1"
-
-Merge Changes:
-$ git checkout master
-$ git merge --no-ff release-1.2
-$ git tag -a 1.2
-
-Also:
-$ git checkout develop
-$ git merge --no-ff hotfix-1.2.1
+### Hotfix Branches
+- **Purpose**: Quickly fix critical bugs in production.
+- **Creation**: `git checkout -b hotfix/1.2.1 master`.
+- **Merging**: Merge into both `master` and `develop`.
+- **Process**:
+  1. Bump version number (`./bump-version.sh 1.2.1`).
+  2. Commit the changes.
+  3. Merge into `master`, tag the release.
+  4. Merge the changes back into `develop`.
+- **Best Practices**:
+  - Act quickly to resolve production issues.
+  - Ensure minimal changes to fix the issue effectively.
 ```
 
 ####Ideal Commit Tree:
